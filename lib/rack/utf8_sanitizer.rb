@@ -115,6 +115,9 @@ module Rack
 
     def sanitize_io(io, uri_encoded = false)
       input = io.read
+
+      return io.rewind unless input
+
       sanitized_input = sanitize_string(strip_byte_order_mark(input))
       if uri_encoded
         sanitized_input = sanitize_uri_encoded_string(sanitized_input).

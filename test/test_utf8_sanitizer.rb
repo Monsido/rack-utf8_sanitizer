@@ -2,6 +2,7 @@
 
 require 'bacon/colored_output'
 require 'rack/utf8_sanitizer'
+require 'ostruct'
 
 describe Rack::UTF8Sanitizer do
   before do
@@ -406,6 +407,20 @@ describe Rack::UTF8Sanitizer do
         sanitized_input.should.be.valid_encoding
         sanitized_input.should == input
       end
+    end
+  end
+
+  describe "HEAD request" do
+    it "does not sanitize input" do
+      input = OpenStruct.new(read: nil)
+      request_env = {
+          "REQUEST_METHOD" => "POST",
+          "CONTENT_TYPE" => "application/vnd.api+json",
+          "HTTP_USER_AGENT" => "Mozilla 5.0",
+          "rack.input" => input,
+      }
+      response_env = @app.(request_env)
+      response_env['rack.input'].should.be.same_as input
     end
   end
 end
